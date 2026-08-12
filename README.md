@@ -1,79 +1,54 @@
 SmartLearnSA Frontend
 
-SmartLearnSA is a South African learning platform frontend built with React and Vite. The application provides separate learning and management experiences for students, tutors, and administrators.
+SmartLearnSA is a South African learning platform frontend built with React, Vite, Tailwind CSS, Axios, React Router, Framer Motion, and Lucide React.
+
+The platform provides separate experiences for students, tutors, and administrators.
 
 Features
-
 Student
-
 Student registration and login
-
 Browse published courses
-
 View course details
-
 View published lessons
-
 View course assignments
-
 Submit assignment answers
-
 Submit assignment file URLs
-
 Update existing submissions
-
 View submission history
-
-View marks and tutor feedback
-
+View marks
+View tutor feedback
 Tutor
-
 Tutor registration and login
-
 Tutor dashboard
-
-Create, edit, publish, unpublish, and delete courses
-
-Create, edit, publish, unpublish, and delete lessons
-
-Associate assignments with courses and lessons
-
-Create, edit, publish, unpublish, and delete assignments
-
+Create courses
+Edit courses
+Publish and unpublish courses
+Delete courses
+Create lessons
+Edit lessons
+Publish and unpublish lessons
+Delete lessons
+Create assignments
+Edit assignments
+Publish and unpublish assignments
+Delete assignments
 View student submissions
-
 Grade submissions
-
 Provide tutor feedback
-
 Admin
-
-Admin authentication and protected dashboard structure
-
+Admin login
+Protected admin dashboard
 Admin role-based routing
-
-Dashboard shell for future administration features
-
 Technology Stack
-
 React
-
 Vite
-
-React Router DOM
-
-Axios
-
-Framer Motion
-
-Lucide React
-
-Tailwind CSS v4
-
 JavaScript / JSX
-
+React Router DOM
+Axios
+Framer Motion
+Lucide React
+Tailwind CSS v4
 Project Structure
-
 src/
 ├── api/
 │   ├── axios.js
@@ -86,6 +61,7 @@ src/
 ├── components/
 │   ├── auth/
 │   │   └── ProtectedRoute.jsx
+│   │
 │   └── layout/
 │       ├── MainLayout.jsx
 │       ├── Navbar.jsx
@@ -93,6 +69,7 @@ src/
 │
 ├── pages/
 │   ├── Home.jsx
+│   │
 │   ├── auth/
 │   │   ├── Login.jsx
 │   │   └── Register.jsx
@@ -125,49 +102,43 @@ src/
 ├── App.jsx
 ├── main.jsx
 └── index.css
-
 Getting Started
-
 Prerequisites
 
-Make sure you have installed:
+Install:
 
 Node.js
-
 npm
+SmartLearnSA Spring Boot backend
 
-The SmartLearnSA Spring Boot backend
+The backend should normally run on:
 
-Installation
+http://localhost:8080
+Install dependencies
 
-Clone or open the frontend project:
-
-cd smartlearn-frontend
-
-Install dependencies:
+From the frontend project:
 
 npm install
-
-Start the development server:
-
+Start the development server
 npm run dev
 
-Vite will normally start the application at:
+Vite normally starts at:
 
 http://localhost:5173
 
-If port 5173 is already in use, Vite may automatically use another port such as 5174.
+If port 5173 is already being used, Vite may use another port such as:
 
-Environment and API Configuration
+http://localhost:5174
+Main Dependencies
 
-The frontend uses Axios with:
+Install the main frontend dependencies with:
 
-baseURL: "/api"
+npm install axios react-router-dom framer-motion lucide-react tailwindcss @tailwindcss/vite
+Tailwind CSS
 
-The Vite development server proxies /api requests to the Spring Boot backend.
+This project uses Tailwind CSS v4.
 
-Example vite.config.js:
-
+vite.config.js
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
@@ -188,26 +159,72 @@ export default defineConfig({
         }
     }
 });
+src/index.css
+@import "tailwindcss";
+API Configuration
 
-This means a frontend request such as:
+Axios uses /api as the base URL.
 
-/api/auth/login
+src/api/axios.js
+import axios from "axios";
 
-is forwarded during development to:
+const api = axios.create({
+    baseURL: "/api",
+    withCredentials: true,
+    headers: {
+        "Content-Type": "application/json"
+    }
+});
 
-http://localhost:8080/api/auth/login
+api.interceptors.response.use(
+    response => response,
+    error => {
 
+        if (error.response?.status === 401) {
+
+            localStorage.removeItem(
+                "smartlearn-user"
+            );
+        }
+
+        return Promise.reject(error);
+    }
+);
+
+export default api;
+
+During development:
+
+Frontend
+    ↓
+/api/...
+    ↓
+Vite Proxy
+    ↓
+http://localhost:8080/api/...
+    ↓
+Spring Boot Backend
 Authentication
 
 SmartLearnSA uses session-based authentication.
 
-The frontend sends credentials using Axios with:
+The frontend sends requests with:
 
 withCredentials: true
 
-The backend creates and stores the authenticated Spring Security context in the HTTP session.
+The backend creates the authenticated Spring Security session.
 
-The frontend also stores the returned user information in:
+The authenticated user returned by the backend is represented by AuthResponse:
+
+{
+    "userId": 1,
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john@example.com",
+    "role": "STUDENT"
+}
+
+The frontend stores the user in:
 
 localStorage
 
@@ -215,149 +232,146 @@ using:
 
 smartlearn-user
 
-Role-based routing is handled by ProtectedRoute.
-
-Supported roles currently include:
-
-ADMIN
-TUTOR
-STUDENT
-PARENT
-
-The current frontend portal implementations focus primarily on:
-
-TUTOR
-STUDENT
-ADMIN
-
-Main Routes
-
-Public
-
-/
- /login
- /register
-
-Tutor
-
-/tutor/dashboard
-/tutor/courses
-/tutor/courses/create
-/tutor/courses/:id/edit
-/tutor/lessons
-/tutor/lessons/create
-/tutor/lessons/:id/edit
-/tutor/assignments
-/tutor/assignments/create
-/tutor/assignments/:id/edit
-/tutor/assignments/:id/submissions
-
-Student
-
-/student/dashboard
-/student/courses
-/student/courses/:id
-/student/lessons/:id
-/student/assignments
-/student/assignments/:id
-/student/submissions
-
-Admin
-
-/admin/dashboard
-
-Learning Flow
-
-The main student learning flow is:
-
-Student Login
-    ↓
-Student Dashboard
-    ↓
-Courses
-    ↓
-Course Details
-    ↓
-Published Lessons
-    ↓
-Lesson Details
-    ↓
-Assignments
-    ↓
-Assignment Details
-    ↓
-Submit Assignment
-    ↓
-Tutor Grades Submission
-    ↓
-Student Views Mark + Feedback
-
-Tutor Flow
-
-The main tutor workflow is:
-
-Tutor Login
-    ↓
-Tutor Dashboard
-    ↓
-Create Course
-    ↓
-Create Lessons
-    ↓
-Publish Lessons
-    ↓
-Create Assignments
-    ↓
-Publish Assignments
-    ↓
-Students Submit Work
-    ↓
-Review Submissions
-    ↓
-Grade + Feedback
-
-Backend API Integration
-
-The frontend currently communicates with these backend areas:
-
-Authentication
+Authentication endpoints:
 
 POST /api/auth/register
 POST /api/auth/login
 GET  /api/auth/me
 POST /api/auth/logout
+Supported Roles
 
+The backend currently defines:
+
+ADMIN
+TUTOR
+PARENT
+STUDENT
+
+The current frontend provides complete portal flows for:
+
+ADMIN
+TUTOR
+STUDENT
+
+The Parent portal can be added later.
+
+Application Routes
+Public
+/
+ /login
+ /register
+Tutor
+/tutor/dashboard
+
+/tutor/courses
+/tutor/courses/create
+/tutor/courses/:id/edit
+
+/tutor/lessons
+/tutor/lessons/create
+/tutor/lessons/:id/edit
+
+/tutor/assignments
+/tutor/assignments/create
+/tutor/assignments/:id/edit
+/tutor/assignments/:id/submissions
+Student
+/student/dashboard
+
+/student/courses
+/student/courses/:id
+
+/student/lessons/:id
+
+/student/assignments
+/student/assignments/:id
+
+/student/submissions
+Admin
+/admin/dashboard
+Student Learning Flow
+Student Registration
+        ↓
+Student Login
+        ↓
+Student Dashboard
+        ↓
+Courses
+        ↓
+Course Details
+        ↓
+Published Lessons
+        ↓
+Lesson Details
+        ↓
+Assignments
+        ↓
+Assignment Details
+        ↓
+Submit Assignment
+        ↓
+Tutor Grades Submission
+        ↓
+Student Views Mark + Feedback
+        ↓
+My Submissions
+Tutor Learning Management Flow
+Tutor Registration
+        ↓
+Tutor Login
+        ↓
+Tutor Dashboard
+        ↓
+Create Course
+        ↓
+Create Lessons
+        ↓
+Publish Lessons
+        ↓
+Create Assignments
+        ↓
+Publish Assignments
+        ↓
+Students Submit Work
+        ↓
+View Submissions
+        ↓
+Grade Submission
+        ↓
+Provide Feedback
+Backend API Integration
+Authentication
+POST /api/auth/register
+POST /api/auth/login
+GET  /api/auth/me
+POST /api/auth/logout
 Subjects
-
 GET /api/subjects
 GET /api/subjects/{id}
-
 Courses
-
-GET    /api/courses
-GET    /api/courses/{id}
-
+Public / Student
+GET /api/courses
+GET /api/courses/{id}
+Tutor
 GET    /api/tutor/courses
 POST   /api/tutor/courses
 PUT    /api/tutor/courses/{courseId}
 PUT    /api/tutor/courses/{id}/publish
 PUT    /api/tutor/courses/{id}/unpublish
 DELETE /api/tutor/courses/{id}
-
 Lessons
-
-GET    /api/courses/{courseId}/lessons
-GET    /api/lessons/{lessonId}
-
+Public / Student
+GET /api/courses/{courseId}/lessons
+GET /api/lessons/{lessonId}
+Tutor
 GET    /api/tutor/courses/{courseId}/lessons
 POST   /api/tutor/courses/{courseId}/lessons
 PUT    /api/tutor/lessons/{lessonId}
 PUT    /api/tutor/lessons/{lessonId}/publish
 PUT    /api/tutor/lessons/{lessonId}/unpublish
 DELETE /api/tutor/lessons/{lessonId}
-
 Assignments
-
+Tutor
 GET    /api/tutor/assignments
 GET    /api/tutor/courses/{courseId}/assignments
 POST   /api/tutor/assignments
@@ -365,87 +379,230 @@ PUT    /api/tutor/assignments/{assignmentId}
 PUT    /api/tutor/assignments/{assignmentId}/publish
 PUT    /api/tutor/assignments/{assignmentId}/unpublish
 DELETE /api/tutor/assignments/{assignmentId}
-
-GET    /api/student/assignments
-GET    /api/assignments/{assignmentId}
-
+Student
+GET /api/student/assignments
+GET /api/assignments/{assignmentId}
 Assignment Submissions
-
+Student
 POST /api/student/assignments/{assignmentId}/submit
 GET  /api/student/assignments/{assignmentId}/submission
 GET  /api/student/submissions
+Tutor
+GET /api/tutor/assignments/{assignmentId}/submissions
+PUT /api/tutor/submissions/{submissionId}/grade
+Course Structure
 
-GET  /api/tutor/assignments/{assignmentId}/submissions
-PUT  /api/tutor/submissions/{submissionId}/grade
+Courses are associated with:
 
-Styling
+Course
+├── Subject
+├── Grade
+├── Curriculum
+├── Tutor
+├── Lessons
+└── Assignments
 
-Tailwind CSS v4 is used for the application UI.
+Supported grades:
 
-The main stylesheet uses:
+GRADE_R
+GRADE_1
+GRADE_2
+GRADE_3
+GRADE_4
+GRADE_5
+GRADE_6
+GRADE_7
+GRADE_8
+GRADE_9
+GRADE_10
+GRADE_11
+GRADE_12
+Frontend Components
+ProtectedRoute
 
-@import "tailwindcss";
+ProtectedRoute.jsx protects pages according to the logged-in user's role.
 
-Framer Motion is used for page and component animations.
+Example:
 
-Lucide React provides icons throughout the application.
+<ProtectedRoute
+    allowedRoles={["TUTOR"]}
+/>
+MainLayout
 
-Build for Production
+Provides:
 
-Create a production build:
+Navbar
+Sidebar
+Main application content
+Navbar
+
+Provides:
+
+SmartLearn branding
+Current user
+Logout
+Sidebar
+
+Provides role-specific navigation for:
+
+TUTOR
+STUDENT
+ADMIN
+Assignment Submission
+
+Students can submit:
+
+Answer
+
+or:
+
+File URL
+
+or both.
+
+The backend validates that at least one is supplied.
+
+A submission can be updated before grading again, and the updated submission resets:
+
+Mark
+Feedback
+Graded At
+
+so that changed work can be reviewed again.
+
+Tutor Grading
+
+Tutors can provide:
+
+Mark
+Feedback
+
+The mark cannot be negative and cannot exceed the assignment's total marks.
+
+Example:
+
+{
+    "mark": 42,
+    "feedback": "Good work. Show more working in question 3."
+}
+Development Commands
+
+Start development server:
+
+npm run dev
+
+Create production build:
 
 npm run build
 
-Preview the production build:
+Preview production build:
 
 npm run preview
+Common Development Issues
+Axios cannot be resolved
 
-Development Notes
+Install:
 
-Keep API calls inside the src/api layer.
+npm install axios
+React Router cannot be resolved
 
-Keep protected pages behind ProtectedRoute.
+Install:
 
-Do not place duplicate API mappings in the backend controllers.
+npm install react-router-dom
+Tailwind cannot be resolved
 
-Keep the frontend API paths aligned with the Spring Boot controllers.
+Install:
 
-The backend must be running on http://localhost:8080 when using the development proxy.
+npm install tailwindcss @tailwindcss/vite
+Vite cannot resolve a page import
 
-Session authentication requires Axios requests to use credentials.
+Check that the referenced file actually exists.
 
-Future Improvements
+For example:
 
-Potential future modules include:
+import TutorCourses from "./pages/tutor/TutorCourses";
+
+requires:
+
+src/pages/tutor/TutorCourses.jsx
+Vite says port 5173 is already in use
+
+Stop the other Vite process with:
+
+Ctrl + C
+
+or use the alternate port Vite provides.
+
+API returns 404
+
+Check:
+
+Spring Boot is running.
+Spring Boot is running on port 8080.
+vite.config.js contains the /api proxy.
+Axios uses baseURL: "/api".
+Production Build
+
+Run:
+
+npm run build
+
+The compiled frontend will be placed in:
+
+dist/
+
+For production deployment, configure the hosting platform so /api requests point to the deployed Spring Boot backend.
+
+Future Features
+
+Possible future modules include:
 
 Parent portal
-
 Admin user management
-
-Course administration
-
+Admin course management
 Tutor management
-
 Student progress tracking
-
-Assignment analytics
-
+Course enrollment
 Notifications
-
 Search and filtering
-
 Profile management
-
-File upload instead of manually entering file URLs
-
+File uploads
+Assignment analytics
+Progress dashboards
 Curriculum-specific learning paths
+Playwright frontend testing
+Responsive mobile navigation
+Development Architecture
 
-Improved mobile navigation
+The frontend follows a simple separation of concerns:
 
-Automated testing with Playwright
+Pages
+  ↓
+API layer
+  ↓
+Axios
+  ↓
+Vite proxy
+  ↓
+Spring Boot REST API
+  ↓
+Service layer
+  ↓
+Repository
+  ↓
+Database
 
-Author
+API calls should remain inside:
 
-SmartLearnSA Frontend
+src/api/
 
-Built with React, Vite, Tailwind CSS and Spring Boot API integration.
+while UI pages remain inside:
+
+src/pages/
+
+Protected role-specific pages should remain behind:
+
+ProtectedRoute
+SmartLearnSA
+
+A learning platform focused on structured courses, lessons, assignments, submissions, grading, and feedback for students and tutors.
