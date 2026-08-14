@@ -1,27 +1,55 @@
-
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { motion } from "framer-motion";
 import {
+    Link,
+    useParams
+} from "react-router-dom";
+
+import { motion } from "framer-motion";
+
+import {
+    AlertCircle,
     ArrowLeft,
     BookOpen,
+    CheckCircle,
     ExternalLink,
     FileText,
+    Loader2,
     PlayCircle,
-    Video,
-    AlertCircle
+    Video
 } from "lucide-react";
 
-import { getLesson } from "../../api/lessonApi";
+import {
+    completeLesson
+} from "../../api/progressApi";
+
+import {
+    getLesson
+} from "../../api/lessonApi";
 
 
 export default function StudentLessonDetails() {
 
     const { id } = useParams();
 
-    const [lesson, setLesson] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+
+    // =========================================================
+    // STATE
+    // =========================================================
+
+    const [lesson, setLesson] =
+        useState(null);
+
+    const [loading, setLoading] =
+        useState(true);
+
+    const [error, setError] =
+        useState("");
+
+    const [completed, setCompleted] =
+        useState(false);
+
+    const [completing, setCompleting] =
+        useState(false);
 
 
     // =========================================================
@@ -29,6 +57,17 @@ export default function StudentLessonDetails() {
     // =========================================================
 
     useEffect(() => {
+
+        if (!id) {
+
+            setError(
+                "Lesson ID is missing."
+            );
+
+            setLoading(false);
+
+            return;
+        }
 
         loadLesson();
 
@@ -42,7 +81,8 @@ export default function StudentLessonDetails() {
             setLoading(true);
             setError("");
 
-            const data = await getLesson(id);
+            const data =
+                await getLesson(id);
 
             setLesson(data);
 
@@ -66,17 +106,64 @@ export default function StudentLessonDetails() {
 
 
     // =========================================================
+    // COMPLETE LESSON
+    // =========================================================
+
+    const handleComplete = async () => {
+
+        if (completed) {
+            return;
+        }
+
+
+        try {
+
+            setCompleting(true);
+            setError("");
+
+
+            await completeLesson(
+                id
+            );
+
+
+            setCompleted(true);
+
+        } catch (error) {
+
+            console.error(
+                "Failed to complete lesson:",
+                error
+            );
+
+            setError(
+                error.response?.data?.message ||
+                "Failed to mark lesson as complete."
+            );
+
+        } finally {
+
+            setCompleting(false);
+        }
+    };
+
+
+    // =========================================================
     // LOADING
     // =========================================================
 
     if (loading) {
 
         return (
+
             <div className="flex min-h-[60vh] items-center justify-center">
 
                 <div className="text-center">
 
-                    <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600" />
+                    <Loader2
+                        size={42}
+                        className="mx-auto animate-spin text-indigo-600"
+                    />
 
                     <p className="mt-4 text-gray-500">
                         Loading lesson...
@@ -96,6 +183,7 @@ export default function StudentLessonDetails() {
     if (error || !lesson) {
 
         return (
+
             <div className="mx-auto max-w-3xl">
 
                 <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
@@ -105,20 +193,37 @@ export default function StudentLessonDetails() {
                         size={40}
                     />
 
+
                     <h1 className="mt-4 text-2xl font-bold text-gray-900">
+
                         Unable to Load Lesson
+
                     </h1>
 
+
                     <p className="mt-2 text-red-600">
-                        {error || "Lesson not found."}
+
+                        {error ||
+                            "Lesson not found."}
+
                     </p>
 
+
                     <Link
-                        to="/student/courses"
-                        className="mt-6 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white hover:bg-indigo-700"
+                        to={
+                            lesson?.courseId
+                                ? `/student/courses/${lesson.courseId}`
+                                : "/student/courses"
+                        }
+                        className="mt-6 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-700"
                     >
-                        <ArrowLeft size={18} />
-                        Back to Courses
+
+                        <ArrowLeft
+                            size={18}
+                        />
+
+                        Back to Course
+
                     </Link>
 
                 </div>
@@ -134,9 +239,12 @@ export default function StudentLessonDetails() {
 
     return (
 
-        <div className="mx-auto max-w-5xl space-y-8">
+        <div className="mx-auto max-w-5xl space-y-8 pb-12">
 
-            {/* Back */}
+
+            {/* =================================================
+                BACK TO COURSE
+            ================================================= */}
 
             <motion.div
                 initial={{
@@ -151,10 +259,12 @@ export default function StudentLessonDetails() {
 
                 <Link
                     to={`/student/courses/${lesson.courseId}`}
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 transition hover:text-indigo-700"
                 >
 
-                    <ArrowLeft size={18} />
+                    <ArrowLeft
+                        size={18}
+                    />
 
                     Back to Course
 
@@ -163,7 +273,9 @@ export default function StudentLessonDetails() {
             </motion.div>
 
 
-            {/* Header */}
+            {/* =================================================
+                LESSON HEADER
+            ================================================= */}
 
             <motion.div
                 initial={{
@@ -177,47 +289,94 @@ export default function StudentLessonDetails() {
                 transition={{
                     duration: 0.5
                 }}
-                className="rounded-2xl bg-linear-to-r from-indigo-600 to-purple-600 p-8 text-white shadow-lg"
+                className="rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 p-8 text-white shadow-lg sm:p-10"
             >
 
                 <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
 
+                    {/* Icon */}
+
                     <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/20">
 
-                        <BookOpen size={30} />
+                        <BookOpen
+                            size={30}
+                        />
 
                     </div>
 
-                    <div>
+
+                    {/* Information */}
+
+                    <div className="min-w-0">
 
                         <div className="mb-2 flex flex-wrap items-center gap-2">
 
-                            <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">
-                                Lesson {lesson.lessonOrder}
-                            </span>
+                            {lesson.lessonOrder != null && (
+
+                                <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">
+
+                                    Lesson{" "}
+                                    {lesson.lessonOrder}
+
+                                </span>
+
+                            )}
+
 
                             {lesson.published && (
+
                                 <span className="rounded-full bg-green-400/20 px-3 py-1 text-xs font-semibold text-green-100">
+
                                     Published
+
                                 </span>
+
+                            )}
+
+
+                            {completed && (
+
+                                <span className="inline-flex items-center gap-1 rounded-full bg-green-500 px-3 py-1 text-xs font-semibold text-white">
+
+                                    <CheckCircle
+                                        size={13}
+                                    />
+
+                                    Completed
+
+                                </span>
+
                             )}
 
                         </div>
 
-                        <h1 className="text-3xl font-bold">
+
+                        <h1 className="text-3xl font-bold sm:text-4xl">
+
                             {lesson.title}
+
                         </h1>
 
+
                         {lesson.courseTitle && (
+
                             <p className="mt-2 text-indigo-100">
+
                                 {lesson.courseTitle}
+
                             </p>
+
                         )}
 
+
                         {lesson.description && (
+
                             <p className="mt-4 max-w-3xl leading-7 text-indigo-100">
+
                                 {lesson.description}
+
                             </p>
+
                         )}
 
                     </div>
@@ -227,7 +386,41 @@ export default function StudentLessonDetails() {
             </motion.div>
 
 
-            {/* Content */}
+            {/* =================================================
+                PAGE ERROR
+            ================================================= */}
+
+            {error && (
+
+                <motion.div
+                    initial={{
+                        opacity: 0,
+                        y: -10
+                    }}
+                    animate={{
+                        opacity: 1,
+                        y: 0
+                    }}
+                    className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+                >
+
+                    <AlertCircle
+                        size={19}
+                        className="mt-0.5 shrink-0"
+                    />
+
+                    <span>
+                        {error}
+                    </span>
+
+                </motion.div>
+
+            )}
+
+
+            {/* =================================================
+                LESSON CONTENT
+            ================================================= */}
 
             <motion.section
                 initial={{
@@ -248,12 +441,17 @@ export default function StudentLessonDetails() {
 
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600">
 
-                        <FileText size={21} />
+                        <FileText
+                            size={21}
+                        />
 
                     </div>
 
+
                     <h2 className="text-2xl font-bold text-gray-900">
+
                         Lesson Content
+
                     </h2>
 
                 </div>
@@ -262,13 +460,17 @@ export default function StudentLessonDetails() {
                 {lesson.content ? (
 
                     <div className="whitespace-pre-line text-base leading-8 text-gray-700">
+
                         {lesson.content}
+
                     </div>
 
                 ) : (
 
                     <div className="rounded-xl bg-gray-50 p-8 text-center text-gray-500">
+
                         No lesson content has been added yet.
+
                     </div>
 
                 )}
@@ -276,7 +478,9 @@ export default function StudentLessonDetails() {
             </motion.section>
 
 
-            {/* Video */}
+            {/* =================================================
+                VIDEO
+            ================================================= */}
 
             {lesson.videoUrl && (
 
@@ -299,12 +503,17 @@ export default function StudentLessonDetails() {
 
                         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-100 text-red-600">
 
-                            <Video size={21} />
+                            <Video
+                                size={21}
+                            />
 
                         </div>
 
+
                         <h2 className="text-2xl font-bold text-gray-900">
+
                             Lesson Video
+
                         </h2>
 
                     </div>
@@ -321,18 +530,26 @@ export default function StudentLessonDetails() {
 
                             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
 
-                                <PlayCircle size={25} />
+                                <PlayCircle
+                                    size={25}
+                                />
 
                             </div>
+
 
                             <div>
 
                                 <p className="font-semibold text-gray-900">
+
                                     Watch Lesson Video
+
                                 </p>
 
+
                                 <p className="mt-1 text-sm text-gray-500">
+
                                     Open the lesson video
+
                                 </p>
 
                             </div>
@@ -352,7 +569,9 @@ export default function StudentLessonDetails() {
             )}
 
 
-            {/* Resource */}
+            {/* =================================================
+                RESOURCE
+            ================================================= */}
 
             {lesson.resourceUrl && (
 
@@ -375,12 +594,17 @@ export default function StudentLessonDetails() {
 
                         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
 
-                            <FileText size={21} />
+                            <FileText
+                                size={21}
+                            />
 
                         </div>
 
+
                         <h2 className="text-2xl font-bold text-gray-900">
+
                             Learning Resource
+
                         </h2>
 
                     </div>
@@ -390,25 +614,33 @@ export default function StudentLessonDetails() {
                         href={lesson.resourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-between rounded-xl border border-gray-200 p-5 transition hover:border-indigo-300 hover:bg-indigo-50"
+                        className="group flex items-center justify-between rounded-xl border border-gray-200 p-5 transition hover:border-indigo-300 hover:bg-indigo-50"
                     >
 
                         <div className="flex items-center gap-4">
 
                             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
 
-                                <FileText size={24} />
+                                <FileText
+                                    size={24}
+                                />
 
                             </div>
+
 
                             <div>
 
                                 <p className="font-semibold text-gray-900">
+
                                     Open Learning Resource
+
                                 </p>
 
+
                                 <p className="mt-1 text-sm text-gray-500">
+
                                     View or download the additional resource
+
                                 </p>
 
                             </div>
@@ -418,7 +650,7 @@ export default function StudentLessonDetails() {
 
                         <ExternalLink
                             size={20}
-                            className="text-gray-400"
+                            className="text-gray-400 transition group-hover:text-indigo-600"
                         />
 
                     </a>
@@ -427,7 +659,168 @@ export default function StudentLessonDetails() {
 
             )}
 
+
+            {/* =================================================
+                COMPLETE LESSON
+            ================================================= */}
+
+            <motion.section
+                initial={{
+                    opacity: 0,
+                    y: 25
+                }}
+                animate={{
+                    opacity: 1,
+                    y: 0
+                }}
+                transition={{
+                    delay: 0.3
+                }}
+                className={`rounded-2xl border p-6 shadow-sm sm:p-8 ${
+                    completed
+                        ? "border-green-200 bg-green-50"
+                        : "border-indigo-100 bg-indigo-50"
+                }`}
+            >
+
+                <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+
+                    <div>
+
+                        <div className="flex items-center gap-3">
+
+                            <div
+                                className={`flex h-11 w-11 items-center justify-center rounded-xl ${
+                                    completed
+                                        ? "bg-green-100 text-green-600"
+                                        : "bg-indigo-100 text-indigo-600"
+                                }`}
+                            >
+
+                                <CheckCircle
+                                    size={23}
+                                />
+
+                            </div>
+
+
+                            <div>
+
+                                <h2 className="text-xl font-bold text-gray-900">
+
+                                    Lesson Progress
+
+                                </h2>
+
+
+                                <p className="mt-1 text-sm text-gray-600">
+
+                                    {completed
+                                        ? "You have completed this lesson."
+                                        : "Finished reviewing the lesson? Mark it as complete."}
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        onClick={handleComplete}
+                        disabled={
+                            completed ||
+                            completing
+                        }
+                        className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 font-semibold text-white shadow-sm transition sm:w-auto ${
+                            completed
+                                ? "bg-green-600"
+                                : "bg-indigo-600 hover:bg-indigo-700"
+                        } disabled:cursor-not-allowed disabled:opacity-70`}
+                    >
+
+                        {completed ? (
+
+                            <>
+                                <CheckCircle
+                                    size={18}
+                                />
+
+                                Lesson Completed
+
+                            </>
+
+                        ) : completing ? (
+
+                            <>
+                                <Loader2
+                                    size={18}
+                                    className="animate-spin"
+                                />
+
+                                Saving...
+
+                            </>
+
+                        ) : (
+
+                            <>
+                                <CheckCircle
+                                    size={18}
+                                />
+
+                                Mark Lesson Complete
+
+                            </>
+
+                        )}
+
+                    </button>
+
+                </div>
+
+            </motion.section>
+
+
+            {/* =================================================
+                NAVIGATION
+            ================================================= */}
+
+            <div className="flex flex-col gap-3 border-t border-gray-200 pt-6 sm:flex-row sm:justify-between">
+
+                <Link
+                    to={`/student/courses/${lesson.courseId}`}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-3 font-semibold text-gray-700 transition hover:bg-gray-50"
+                >
+
+                    <ArrowLeft
+                        size={18}
+                    />
+
+                    Back to Course
+
+                </Link>
+
+
+                <Link
+                    to={`/student/assignments?courseId=${lesson.courseId}`}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-700"
+                >
+
+                    View Assignments
+
+                    <ArrowLeft
+                        size={18}
+                        className="rotate-180"
+                    />
+
+                </Link>
+
+            </div>
+
         </div>
     );
 }
-

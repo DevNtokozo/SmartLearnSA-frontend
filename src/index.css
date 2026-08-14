@@ -1,20 +1,25 @@
+@import url("https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
 :root {
     font-family:
-        Inter,
+        "Urbanist",
         ui-sans-serif,
         system-ui,
         -apple-system,
         BlinkMacSystemFont,
-        "Urbanist",
+        "Segoe UI",
         sans-serif;
+
+    font-size: 20px;
+    font-weight: 500;
 
     color: #111827;
     background: #f9fafb;
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
+
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -25,13 +30,20 @@
 
 html {
     scroll-behavior: smooth;
+    font-size: 20px;
 }
 
 body {
     margin: 0;
     min-width: 320px;
     min-height: 100vh;
+
     background: #f9fafb;
+
+    font-family: "Urbanist", sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.6;
 }
 
 button,
@@ -47,4 +59,27 @@ button {
 
 button:disabled {
     cursor: not-allowed;
+}
+
+/* =========================================================
+   GLOBAL TEXT WEIGHTS
+   ========================================================= */
+
+p,
+span,
+label,
+li,
+td,
+th {
+    font-weight: 500;
+}
+
+input,
+textarea,
+select {
+    font-weight: 500;
+}
+
+button {
+    font-weight: 600;
 }

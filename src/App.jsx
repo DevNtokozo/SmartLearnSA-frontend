@@ -12,6 +12,8 @@ import {
 import Home from "./pages/Home";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import TutorPublicProfile
+    from "./pages/public/TutorPublicProfile";
 
 // =========================================================
 // TUTOR
@@ -41,6 +43,9 @@ import EditLesson
 import TutorAssignments
     from "./pages/tutor/TutorAssignments";
 
+import TutorProfile
+    from "./pages/tutor/TutorProfile";    
+
 import CreateAssignment
     from "./pages/tutor/CreateAssignment";
 
@@ -63,6 +68,9 @@ import StudentCourses
 import CourseDetails
     from "./pages/student/CourseDetails";
 
+import MyCourses
+    from "./pages/student/MyCourses";    
+
 import LessonDetails
     from "./pages/student/LessonDetails";
 
@@ -81,6 +89,28 @@ import StudentSubmissions
 
 import AdminDashboard
     from "./pages/admin/AdminDashboard";
+
+import AdminUsers from "./pages/admin/AdminUsers"; 
+
+import AdminUserDetails
+    from "./pages/admin/AdminUserDetails";
+
+import AdminCourses
+    from "./pages/admin/AdminCourses"; 
+    
+import AdminCourseDetails
+    from "./pages/admin/AdminCourseDetails";
+    
+import AdminEnrollments
+    from "./pages/admin/AdminEnrollments"; 
+    
+import AdminSubjectDetails
+    from "./pages/admin/AdminSubjectDetails"; 
+
+import AdminSubjects
+    from "./pages/admin/AdminSubjects";    
+    
+    
 
 // =========================================================
 // COMMON
@@ -122,6 +152,13 @@ function TutorLayout() {
                 <Route
                     path="courses/:id/edit"
                     element={<EditCourse />}
+                />
+
+                <Route
+                    path="profile"
+                    element={
+                    <TutorProfile />
+                  }
                 />
 
                 <Route
@@ -208,6 +245,13 @@ function StudentLayout() {
                 />
 
                 <Route
+                    path="my-courses"
+                    element={
+                    <MyCourses />
+                      }
+                   />
+
+                <Route
                     path="assignments"
                     element={<StudentAssignments />}
                 />
@@ -253,6 +297,41 @@ function AdminLayout() {
                 <Route
                     path="dashboard"
                     element={<AdminDashboard />}
+                />
+
+                <Route
+                    path="users"
+                    element={<AdminUsers />}
+                />
+
+                <Route
+                    path="users/:id"
+                    element={<AdminUserDetails />}
+                />
+
+                <Route
+                    path="courses/:id"
+                    element={<AdminCourseDetails />}
+                />
+
+                <Route
+                    path="subjects"
+                    element={<AdminSubjects />}
+                />
+
+                <Route
+                    path="subjects/:id"
+                    element={<AdminSubjectDetails />}
+                />
+
+                <Route
+                    path="enrollments"
+                    element={<AdminEnrollments />}
+                />
+
+                <Route
+                    path="courses"
+                    element={<AdminCourses />}
                 />
 
                 <Route
@@ -302,6 +381,13 @@ export default function App() {
                     path="/register"
                     element={<Register />}
                 />
+
+                <Route
+                    path="/tutors/:id"
+                    element={
+                    <TutorPublicProfile />
+                      }
+                 />
 
 
                 {/* =================================================

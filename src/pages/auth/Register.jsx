@@ -35,8 +35,22 @@ const GRADE_OPTIONS = [
     "GRADE_9",
     "GRADE_10",
     "GRADE_11",
-    "GRADE_12"
+    "GRADE_12",
+    "UNIVERSITY"
 ];
+
+
+const formatGrade = (grade) => {
+
+    if (grade === "UNIVERSITY") {
+        return "University";
+    }
+
+    return grade.replace(
+        "GRADE_",
+        "Grade "
+    );
+};
 
 
 export default function Register() {
@@ -81,7 +95,7 @@ export default function Register() {
 
 
     // =========================================================
-    // CHANGE
+    // HANDLE CHANGE
     // =========================================================
 
     const handleChange = (event) => {
@@ -91,35 +105,28 @@ export default function Register() {
             value
         } = event.target;
 
-
         setForm(previous => ({
             ...previous,
             [name]: value
         }));
-
 
         setError("");
     };
 
 
     // =========================================================
-    // ROLE CHANGE
+    // HANDLE ROLE
     // =========================================================
 
-    const handleRoleChange = (event) => {
-
-        const role =
-            event.target.value;
-
+    const handleRoleChange = (
+        role
+    ) => {
 
         setForm(previous => ({
 
             ...previous,
 
             role,
-
-            // Clear role-specific fields
-            // when switching roles.
 
             grade:
                 role === "STUDENT"
@@ -148,7 +155,7 @@ export default function Register() {
 
 
     // =========================================================
-    // VALIDATION
+    // VALIDATE
     // =========================================================
 
     const validateForm = () => {
@@ -190,9 +197,10 @@ export default function Register() {
                 return "Please select your grade.";
             }
 
+
             if (!form.school.trim()) {
 
-                return "School is required.";
+                return "School or institution is required.";
             }
         }
 
@@ -214,7 +222,9 @@ export default function Register() {
     // SUBMIT
     // =========================================================
 
-    const handleSubmit = async (event) => {
+    const handleSubmit = async (
+        event
+    ) => {
 
         event.preventDefault();
 
@@ -241,7 +251,7 @@ export default function Register() {
             setLoading(true);
 
 
-            const data = {
+            const registrationData = {
 
                 firstName:
                     form.firstName.trim(),
@@ -285,16 +295,15 @@ export default function Register() {
             };
 
 
-            await register(data);
-
-
-            setSuccess(
-                "Registration successful. You can now sign in."
+            await register(
+                registrationData
             );
 
 
-            // Small delay allows the
-            // success message to be seen.
+            setSuccess(
+                "Registration successful. Redirecting to login..."
+            );
+
 
             setTimeout(() => {
 
@@ -330,7 +339,7 @@ export default function Register() {
 
     return (
 
-        <div className="min-h-screen bg-linear-to-br from-indigo-50 via-white to-slate-100 px-4 py-10">
+        <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-slate-100 px-4 py-10">
 
             <div className="mx-auto max-w-2xl">
 
@@ -350,7 +359,7 @@ export default function Register() {
                 >
 
                     {/* =================================================
-                        BRAND
+                        HEADER
                     ================================================= */}
 
                     <div className="text-center">
@@ -363,16 +372,12 @@ export default function Register() {
 
 
                         <h1 className="mt-6 text-3xl font-bold text-gray-900">
-
                             Create Your Account
-
                         </h1>
 
 
                         <p className="mt-2 text-gray-500">
-
-                            Join SmartLearnSA and start learning or teaching.
-
+                            Join SmartLearnSA and start your learning journey.
                         </p>
 
                     </div>
@@ -437,9 +442,7 @@ export default function Register() {
                         className="mt-8 space-y-6"
                     >
 
-                        {/* =================================================
-                            NAME
-                        ================================================= */}
+                        {/* NAME */}
 
                         <div className="grid gap-5 sm:grid-cols-2">
 
@@ -462,8 +465,8 @@ export default function Register() {
                                         value={form.firstName}
                                         onChange={handleChange}
                                         required
-                                        placeholder="Ntokozo"
-                                        className="w-full rounded-xl border border-gray-300 py-3.5 pl-11 pr-4 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                                        placeholder="First name"
+                                        className="w-full rounded-xl border border-gray-300 py-3.5 pl-11 pr-4 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                                     />
 
                                 </div>
@@ -483,8 +486,8 @@ export default function Register() {
                                     value={form.lastName}
                                     onChange={handleChange}
                                     required
-                                    placeholder="Mbuli"
-                                    className="w-full rounded-xl border border-gray-300 px-4 py-3.5 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                                    placeholder="Last name"
+                                    className="w-full rounded-xl border border-gray-300 px-4 py-3.5 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                                 />
 
                             </div>
@@ -492,9 +495,7 @@ export default function Register() {
                         </div>
 
 
-                        {/* =================================================
-                            EMAIL + PHONE
-                        ================================================= */}
+                        {/* EMAIL + PHONE */}
 
                         <div className="grid gap-5 sm:grid-cols-2">
 
@@ -519,7 +520,7 @@ export default function Register() {
                                         required
                                         autoComplete="email"
                                         placeholder="you@example.com"
-                                        className="w-full rounded-xl border border-gray-300 py-3.5 pl-11 pr-4 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                                        className="w-full rounded-xl border border-gray-300 py-3.5 pl-11 pr-4 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                                     />
 
                                 </div>
@@ -546,7 +547,7 @@ export default function Register() {
                                         value={form.phone}
                                         onChange={handleChange}
                                         placeholder="072 000 0000"
-                                        className="w-full rounded-xl border border-gray-300 py-3.5 pl-11 pr-4 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                                        className="w-full rounded-xl border border-gray-300 py-3.5 pl-11 pr-4 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                                     />
 
                                 </div>
@@ -556,9 +557,7 @@ export default function Register() {
                         </div>
 
 
-                        {/* =================================================
-                            PASSWORD
-                        ================================================= */}
+                        {/* PASSWORD */}
 
                         <div>
 
@@ -585,8 +584,9 @@ export default function Register() {
                                     required
                                     autoComplete="new-password"
                                     placeholder="At least 6 characters"
-                                    className="w-full rounded-xl border border-gray-300 py-3.5 pl-11 pr-12 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                                    className="w-full rounded-xl border border-gray-300 py-3.5 pl-11 pr-12 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                                 />
+
 
                                 <button
                                     type="button"
@@ -612,14 +612,12 @@ export default function Register() {
                         </div>
 
 
-                        {/* =================================================
-                            ROLE
-                        ================================================= */}
+                        {/* ROLE */}
 
                         <div>
 
-                            <label className="mb-2 block text-sm font-semibold text-gray-700">
-                                I want to register as *
+                            <label className="mb-3 block text-sm font-semibold text-gray-700">
+                                Register as *
                             </label>
 
                             <div className="grid gap-4 sm:grid-cols-2">
@@ -627,21 +625,19 @@ export default function Register() {
                                 <button
                                     type="button"
                                     onClick={() =>
-                                        handleRoleChange({
-                                            target: {
-                                                value: "STUDENT"
-                                            }
-                                        })
+                                        handleRoleChange(
+                                            "STUDENT"
+                                        )
                                     }
                                     className={`rounded-2xl border p-5 text-left transition ${
                                         form.role === "STUDENT"
                                             ? "border-indigo-500 bg-indigo-50 ring-2 ring-indigo-100"
-                                            : "border-gray-200 hover:border-indigo-200"
+                                            : "border-gray-200 hover:border-indigo-300"
                                     }`}
                                 >
 
                                     <GraduationCap
-                                        size={26}
+                                        size={27}
                                         className="text-indigo-600"
                                     />
 
@@ -649,8 +645,8 @@ export default function Register() {
                                         Student
                                     </p>
 
-                                    <p className="mt-1 text-sm text-gray-500">
-                                        Learn through courses and assignments.
+                                    <p className="mt-1 text-sm leading-6 text-gray-500">
+                                        Learn through courses, lessons and assignments.
                                     </p>
 
                                 </button>
@@ -659,21 +655,19 @@ export default function Register() {
                                 <button
                                     type="button"
                                     onClick={() =>
-                                        handleRoleChange({
-                                            target: {
-                                                value: "TUTOR"
-                                            }
-                                        })
+                                        handleRoleChange(
+                                            "TUTOR"
+                                        )
                                     }
                                     className={`rounded-2xl border p-5 text-left transition ${
                                         form.role === "TUTOR"
                                             ? "border-indigo-500 bg-indigo-50 ring-2 ring-indigo-100"
-                                            : "border-gray-200 hover:border-indigo-200"
+                                            : "border-gray-200 hover:border-indigo-300"
                                     }`}
                                 >
 
                                     <BookOpen
-                                        size={26}
+                                        size={27}
                                         className="text-indigo-600"
                                     />
 
@@ -681,8 +675,8 @@ export default function Register() {
                                         Tutor
                                     </p>
 
-                                    <p className="mt-1 text-sm text-gray-500">
-                                        Create courses and teach students.
+                                    <p className="mt-1 text-sm leading-6 text-gray-500">
+                                        Create courses and support students.
                                     </p>
 
                                 </button>
@@ -692,20 +686,18 @@ export default function Register() {
                         </div>
 
 
-                        {/* =================================================
-                            STUDENT FIELDS
-                        ================================================= */}
+                        {/* STUDENT */}
 
                         {form.role === "STUDENT" && (
 
                             <motion.div
                                 initial={{
                                     opacity: 0,
-                                    height: 0
+                                    y: -10
                                 }}
                                 animate={{
                                     opacity: 1,
-                                    height: "auto"
+                                    y: 0
                                 }}
                                 className="space-y-5 rounded-2xl bg-gray-50 p-5"
                             >
@@ -726,11 +718,11 @@ export default function Register() {
                                         value={form.grade}
                                         onChange={handleChange}
                                         required
-                                        className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                                        className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                                     >
 
                                         <option value="">
-                                            Select your grade
+                                            Select grade
                                         </option>
 
                                         {GRADE_OPTIONS.map(
@@ -741,9 +733,8 @@ export default function Register() {
                                                     value={grade}
                                                 >
 
-                                                    {grade.replace(
-                                                        "GRADE_",
-                                                        "Grade "
+                                                    {formatGrade(
+                                                        grade
                                                     )}
 
                                                 </option>
@@ -759,7 +750,11 @@ export default function Register() {
                                 <div>
 
                                     <label className="mb-2 block text-sm font-semibold text-gray-700">
-                                        School *
+
+                                        {form.grade === "UNIVERSITY"
+                                            ? "University / Institution *"
+                                            : "School *"}
+
                                     </label>
 
                                     <input
@@ -768,31 +763,32 @@ export default function Register() {
                                         value={form.school}
                                         onChange={handleChange}
                                         required
-                                        placeholder="Your school"
-                                        className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                                        placeholder={
+                                            form.grade === "UNIVERSITY"
+                                                ? "University or institution"
+                                                : "School name"
+                                        }
+                                        className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                                     />
 
                                 </div>
 
                             </motion.div>
-
                         )}
 
 
-                        {/* =================================================
-                            TUTOR FIELDS
-                        ================================================= */}
+                        {/* TUTOR */}
 
                         {form.role === "TUTOR" && (
 
                             <motion.div
                                 initial={{
                                     opacity: 0,
-                                    height: 0
+                                    y: -10
                                 }}
                                 animate={{
                                     opacity: 1,
-                                    height: "auto"
+                                    y: 0
                                 }}
                                 className="space-y-5 rounded-2xl bg-gray-50 p-5"
                             >
@@ -819,7 +815,7 @@ export default function Register() {
                                         }
                                         required
                                         placeholder="e.g. BSc Mathematics"
-                                        className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                                        className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                                     />
 
                                 </div>
@@ -833,27 +829,20 @@ export default function Register() {
 
                                     <textarea
                                         name="bio"
-                                        value={
-                                            form.bio
-                                        }
-                                        onChange={
-                                            handleChange
-                                        }
+                                        value={form.bio}
+                                        onChange={handleChange}
                                         rows={5}
                                         placeholder="Tell students about yourself..."
-                                        className="w-full resize-none rounded-xl border border-gray-300 bg-white px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                                        className="w-full resize-none rounded-xl border border-gray-300 bg-white px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                                     />
 
                                 </div>
 
                             </motion.div>
-
                         )}
 
 
-                        {/* =================================================
-                            SUBMIT
-                        ================================================= */}
+                        {/* SUBMIT */}
 
                         <button
                             type="submit"
@@ -870,9 +859,7 @@ export default function Register() {
                     </form>
 
 
-                    {/* =================================================
-                        LOGIN LINK
-                    ================================================= */}
+                    {/* LOGIN */}
 
                     <div className="mt-8 text-center">
 

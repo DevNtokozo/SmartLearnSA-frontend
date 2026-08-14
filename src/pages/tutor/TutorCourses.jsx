@@ -8,6 +8,8 @@ import {
     Edit,
     Loader2,
     Plus,
+    EyeOff,
+    Eye,
     Trash2,
     XCircle
 } from "lucide-react";

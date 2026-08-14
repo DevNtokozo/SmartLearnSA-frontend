@@ -24,6 +24,7 @@ import {
     getSubjects
 } from "../../api/subjectApi";
 
+
 const GRADE_OPTIONS = [
     "GRADE_R",
     "GRADE_1",
@@ -37,8 +38,10 @@ const GRADE_OPTIONS = [
     "GRADE_9",
     "GRADE_10",
     "GRADE_11",
-    "GRADE_12"
+    "GRADE_12",
+    "UNIVERSITY"
 ];
+
 
 const CURRICULUM_OPTIONS = [
     "CAPS",
@@ -46,12 +49,31 @@ const CURRICULUM_OPTIONS = [
 ];
 
 
+const formatGrade = (grade) => {
+
+    if (grade === "UNIVERSITY") {
+        return "University";
+    }
+
+    return grade.replace(
+        "GRADE_",
+        "Grade "
+    );
+};
+
+
 export default function EditCourse() {
 
-    const navigate = useNavigate();
+    const navigate =
+        useNavigate();
 
-    const { id } = useParams();
+    const { id } =
+        useParams();
 
+
+    // =========================================================
+    // STATE
+    // =========================================================
 
     const [course, setCourse] =
         useState(null);
@@ -74,16 +96,16 @@ export default function EditCourse() {
 
             title: "",
             description: "",
-            thumbnail: "",
             subjectId: "",
             grade: "",
-            curriculum: ""
+            curriculum: "",
+            thumbnail: ""
 
         });
 
 
     // =========================================================
-    // LOAD
+    // LOAD COURSE + SUBJECTS
     // =========================================================
 
     useEffect(() => {
@@ -139,28 +161,38 @@ export default function EditCourse() {
             setForm({
 
                 title:
-                    courseData.title || "",
+                    courseData.title
+                    || "",
 
                 description:
-                    courseData.description || "",
-
-                thumbnail:
-                    courseData.thumbnail || "",
+                    courseData.description
+                    || "",
 
                 subjectId:
-                    courseData.subjectId ?? "",
+                    courseData.subjectId
+                    ?? "",
 
                 grade:
-                    courseData.grade || "",
+                    courseData.grade
+                    || "",
 
                 curriculum:
-                    courseData.curriculum || ""
+                    courseData.curriculum
+                    || "",
+
+                thumbnail:
+                    courseData.thumbnail
+                    || ""
 
             });
 
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                "Failed to load course:",
+                error
+            );
+
 
             setError(
                 error.response?.data?.message ||
@@ -175,20 +207,26 @@ export default function EditCourse() {
 
 
     // =========================================================
-    // FORM
+    // CHANGE
     // =========================================================
 
-    const handleChange = event => {
+    const handleChange = (
+        event
+    ) => {
 
         const {
             name,
             value
         } = event.target;
 
+
         setForm(previous => ({
             ...previous,
             [name]: value
         }));
+
+
+        setError("");
     };
 
 
@@ -196,7 +234,9 @@ export default function EditCourse() {
     // SUBMIT
     // =========================================================
 
-    const handleSubmit = async event => {
+    const handleSubmit = async (
+        event
+    ) => {
 
         event.preventDefault();
 
@@ -255,20 +295,22 @@ export default function EditCourse() {
 
                 description:
                     form.description.trim()
-                        || null,
-
-                thumbnail:
-                    form.thumbnail.trim()
-                        || null,
+                    || null,
 
                 subjectId:
-                    Number(form.subjectId),
+                    Number(
+                        form.subjectId
+                    ),
 
                 grade:
                     form.grade,
 
                 curriculum:
-                    form.curriculum
+                    form.curriculum,
+
+                thumbnail:
+                    form.thumbnail.trim()
+                    || null
 
             };
 
@@ -280,19 +322,29 @@ export default function EditCourse() {
                 );
 
 
-            setCourse(updated);
+            setCourse(
+                updated
+            );
 
 
             navigate(
-                "/tutor/courses"
+                "/tutor/courses",
+                {
+                    replace: true
+                }
             );
 
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                "Failed to update course:",
+                error
+            );
+
 
             setError(
                 error.response?.data?.message ||
+                error.response?.data?.error ||
                 "Failed to update course."
             );
 
@@ -331,6 +383,10 @@ export default function EditCourse() {
     }
 
 
+    // =========================================================
+    // ERROR / NOT FOUND
+    // =========================================================
+
     if (error && !course) {
 
         return (
@@ -339,7 +395,7 @@ export default function EditCourse() {
 
                 <Link
                     to="/tutor/courses"
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700"
                 >
 
                     <ArrowLeft size={18} />
@@ -366,6 +422,11 @@ export default function EditCourse() {
     }
 
 
+    if (!course) {
+        return null;
+    }
+
+
     return (
 
         <motion.div
@@ -377,8 +438,13 @@ export default function EditCourse() {
                 opacity: 1,
                 y: 0
             }}
+            transition={{
+                duration: 0.5
+            }}
             className="mx-auto max-w-3xl pb-10"
         >
+
+            {/* BACK */}
 
             <Link
                 to="/tutor/courses"
@@ -392,15 +458,28 @@ export default function EditCourse() {
             </Link>
 
 
-            <div className="mt-6">
+            {/* HEADER */}
 
-                <div className="flex items-center gap-3">
+            <motion.div
+                initial={{
+                    opacity: 0,
+                    y: -15
+                }}
+                animate={{
+                    opacity: 1,
+                    y: 0
+                }}
+                className="mt-6"
+            >
+
+                <div className="flex items-center gap-4">
 
                     <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600">
 
                         <BookOpen size={25} />
 
                     </div>
+
 
                     <div>
 
@@ -416,22 +495,49 @@ export default function EditCourse() {
 
                 </div>
 
-            </div>
+            </motion.div>
 
+
+            {/* ERROR */}
 
             {error && (
 
-                <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                <motion.div
+                    initial={{
+                        opacity: 0
+                    }}
+                    animate={{
+                        opacity: 1
+                    }}
+                    className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+                >
+
                     {error}
-                </div>
+
+                </motion.div>
 
             )}
 
 
+            {/* FORM */}
+
             <motion.form
                 onSubmit={handleSubmit}
+                initial={{
+                    opacity: 0,
+                    y: 20
+                }}
+                animate={{
+                    opacity: 1,
+                    y: 0
+                }}
+                transition={{
+                    delay: 0.1
+                }}
                 className="mt-8 space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8"
             >
+
+                {/* TITLE */}
 
                 <div>
 
@@ -446,11 +552,14 @@ export default function EditCourse() {
                         onChange={handleChange}
                         required
                         maxLength={150}
-                        className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                        placeholder="e.g. Grade 10 Mathematics"
+                        className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                     />
 
                 </div>
 
+
+                {/* SUBJECT */}
 
                 <div>
 
@@ -463,30 +572,34 @@ export default function EditCourse() {
                         value={form.subjectId}
                         onChange={handleChange}
                         required
-                        className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                        className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                     >
 
                         <option value="">
                             Select subject
                         </option>
 
-                        {subjects.map(subject => (
+                        {subjects.map(
+                            subject => (
 
-                            <option
-                                key={subject.id}
-                                value={subject.id}
-                            >
+                                <option
+                                    key={subject.id}
+                                    value={subject.id}
+                                >
 
-                                {subject.name}
+                                    {subject.name}
 
-                            </option>
+                                </option>
 
-                        ))}
+                            )
+                        )}
 
                     </select>
 
                 </div>
 
+
+                {/* GRADE + CURRICULUM */}
 
                 <div className="grid gap-6 sm:grid-cols-2">
 
@@ -501,28 +614,29 @@ export default function EditCourse() {
                             value={form.grade}
                             onChange={handleChange}
                             required
-                            className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                            className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                         >
 
                             <option value="">
                                 Select grade
                             </option>
 
-                            {GRADE_OPTIONS.map(grade => (
+                            {GRADE_OPTIONS.map(
+                                grade => (
 
-                                <option
-                                    key={grade}
-                                    value={grade}
-                                >
+                                    <option
+                                        key={grade}
+                                        value={grade}
+                                    >
 
-                                    {grade.replace(
-                                        "GRADE_",
-                                        "Grade "
-                                    )}
+                                        {formatGrade(
+                                            grade
+                                        )}
 
-                                </option>
+                                    </option>
 
-                            ))}
+                                )
+                            )}
 
                         </select>
 
@@ -540,7 +654,7 @@ export default function EditCourse() {
                             value={form.curriculum}
                             onChange={handleChange}
                             required
-                            className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                            className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                         >
 
                             <option value="">
@@ -554,7 +668,9 @@ export default function EditCourse() {
                                         key={curriculum}
                                         value={curriculum}
                                     >
+
                                         {curriculum}
+
                                     </option>
 
                                 )
@@ -567,6 +683,8 @@ export default function EditCourse() {
                 </div>
 
 
+                {/* DESCRIPTION */}
+
                 <div>
 
                     <label className="mb-2 block text-sm font-semibold text-gray-700">
@@ -577,12 +695,15 @@ export default function EditCourse() {
                         name="description"
                         value={form.description}
                         onChange={handleChange}
-                        rows={5}
-                        className="w-full resize-none rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                        rows={6}
+                        placeholder="Describe what students will learn..."
+                        className="w-full resize-none rounded-xl border border-gray-300 px-4 py-3 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                     />
 
                 </div>
 
+
+                {/* THUMBNAIL */}
 
                 <div>
 
@@ -602,14 +723,16 @@ export default function EditCourse() {
                             name="thumbnail"
                             value={form.thumbnail}
                             onChange={handleChange}
-                            placeholder="https://example.com/course.jpg"
-                            className="w-full rounded-xl border border-gray-300 py-3 pl-11 pr-4 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                            placeholder="https://example.com/course-image.jpg"
+                            className="w-full rounded-xl border border-gray-300 py-3 pl-11 pr-4 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
                         />
 
                     </div>
 
                 </div>
 
+
+                {/* STATUS */}
 
                 <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
 
@@ -626,6 +749,7 @@ export default function EditCourse() {
                             </p>
 
                         </div>
+
 
                         <span
                             className={`rounded-full px-3 py-1 text-xs font-semibold ${
@@ -646,20 +770,24 @@ export default function EditCourse() {
                 </div>
 
 
+                {/* ACTIONS */}
+
                 <div className="flex flex-col-reverse gap-3 border-t border-gray-100 pt-6 sm:flex-row sm:justify-end">
 
                     <Link
                         to="/tutor/courses"
-                        className="rounded-xl border border-gray-300 px-6 py-3 text-center font-semibold text-gray-700 hover:bg-gray-50"
+                        className="rounded-xl border border-gray-300 px-6 py-3 text-center font-semibold text-gray-700 transition hover:bg-gray-50"
                     >
+
                         Cancel
+
                     </Link>
 
 
                     <button
                         type="submit"
                         disabled={saving}
-                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white shadow-md transition hover:bg-indigo-700 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
                     >
 
                         {saving ? (

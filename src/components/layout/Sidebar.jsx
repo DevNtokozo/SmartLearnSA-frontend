@@ -3,6 +3,8 @@ import {
     BookOpen,
     ClipboardList,
     FileText,
+    GraduationCap,
+    UserCircle,
     LayoutDashboard,
     Users
 } from "lucide-react";
@@ -32,7 +34,11 @@ export default function Sidebar({
             label: "Assignments",
             icon: ClipboardList
         },
-       
+        {
+            to: "/tutor/profile",
+            label: "My Profile",
+            icon: UserCircle
+        }
     ];
 
 
@@ -47,6 +53,11 @@ export default function Sidebar({
             label: "Courses",
             icon: BookOpen
         },
+        {
+        to: "/student/my-courses",
+        label: "My Courses",
+        icon: GraduationCap
+       },
         {
             to: "/student/assignments",
             label: "Assignments",
@@ -74,7 +85,18 @@ export default function Sidebar({
         to: "/admin/courses",
         label: "Courses",
         icon: BookOpen
+    },
+    {
+    to: "/admin/enrollments",
+    label: "Enrollments",
+    icon: GraduationCap
+    },
+    {
+    to: "/admin/users",
+    label: "Users",
+    icon: Users
     }
+
 ];
 
 
