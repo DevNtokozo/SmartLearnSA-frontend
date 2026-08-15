@@ -385,7 +385,7 @@ export default function AdminUserDetails() {
 
             <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
 
-                <div className="bg-gradient-to-r from-indigo-600 to-indigo-500 px-6 py-8 text-white sm:px-8">
+                <div className="bg-linear-to-r from-indigo-600 to-indigo-500 px-6 py-8 text-white sm:px-8">
 
                     <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
 
@@ -781,7 +781,7 @@ function InfoRow({
                 </p>
 
 
-                <p className="mt-1 break-words text-sm font-semibold text-gray-800">
+                <p className="mt-1 wrap-break-word text-sm font-semibold text-gray-800">
 
                     {value}
 

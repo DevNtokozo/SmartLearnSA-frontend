@@ -339,7 +339,7 @@ export default function Register() {
 
     return (
 
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-slate-100 px-4 py-10">
+        <div className="min-h-screen bg-linear-to-br from-indigo-50 via-white to-slate-100 px-4 py-10">
 
             <div className="mx-auto max-w-2xl">
 
