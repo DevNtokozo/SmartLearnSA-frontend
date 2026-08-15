@@ -377,7 +377,7 @@ export default function Register() {
 
 
                         <p className="mt-2 text-gray-500">
-                            Join SmartLearnSA and start your learning journey.
+                            Join SmartLearnSA and start your learning journey with qualified tutors.
                         </p>
 
                     </div>
